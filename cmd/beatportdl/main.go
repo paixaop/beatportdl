@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/vbauerster/mpb/v8"
 	"io"
 	"os"
 	"os/signal"
@@ -14,6 +12,9 @@ import (
 	"syscall"
 	"unspok3n/beatportdl/config"
 	"unspok3n/beatportdl/internal/beatport"
+
+	"github.com/fatih/color"
+	"github.com/vbauerster/mpb/v8"
 )
 
 const (
@@ -40,12 +41,73 @@ type application struct {
 	bs *beatport.Beatport
 }
 
+// printConfig prints the current configuration values
+func printConfig(cfg *config.AppConfig) {
+	boldBlue := color.New(color.FgBlue, color.Bold)
+	boldGreen := color.New(color.FgGreen, color.Bold)
+
+	boldBlue.Println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	boldBlue.Println("📋 Current Configuration:")
+	boldBlue.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+	fmt.Printf("Username: %s\n", cfg.Username)
+	fmt.Printf("Downloads Directory: %s\n", cfg.DownloadsDirectory)
+	fmt.Printf("Quality: %s\n", cfg.Quality)
+	fmt.Printf("Show Progress: %t\n", cfg.ShowProgress)
+	fmt.Printf("Write Error Log: %t\n", cfg.WriteErrorLog)
+
+	fmt.Printf("Max Download Workers: %d\n", cfg.MaxDownloadWorkers)
+	fmt.Printf("Max Global Workers: %d\n", cfg.MaxGlobalWorkers)
+
+	fmt.Printf("Sort By Context: %t\n", cfg.SortByContext)
+	fmt.Printf("Sort By Label: %t\n", cfg.SortByLabel)
+	fmt.Printf("Force Release Directories: %t\n", cfg.ForceReleaseDirectories)
+	fmt.Printf("Track Exists Behavior: %s\n", cfg.TrackExists)
+	fmt.Printf("Track Number Padding: %d\n", cfg.TrackNumberPadding)
+	fmt.Printf("Create M3U8 Playlist: %t\n", cfg.CreateM3U8Playlist)
+
+	fmt.Printf("Cover Size: %s\n", cfg.CoverSize)
+	fmt.Printf("Keep Cover: %t\n", cfg.KeepCover)
+	fmt.Printf("Fix Tags: %t\n", cfg.FixTags)
+
+	if cfg.Proxy != "" {
+		fmt.Printf("Using Proxy: %s\n", cfg.Proxy)
+	}
+
+	boldGreen.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println()
+}
+
 func main() {
-	cfg, cachePath, err := Setup()
+	// Define command line flags
+	configDir := flag.String("config-dir", "", "Directory to load configuration files from (beatportdl-config.yml and beatportdl-credentials.json)")
+	quitFlag := flag.Bool("q", false, "Quit the main loop after finishing")
+	createPlaylistFlag := flag.Bool("playlist", false, "Create an m3u8 playlist file when multiple tracks are downloaded from a single URL")
+
+	flag.Parse()
+	inputArgs := flag.Args()
+
+	// Check if the playlist flag was explicitly provided
+	createPlaylistFlagSet := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "playlist" {
+			createPlaylistFlagSet = true
+		}
+	})
+
+	cfg, cachePath, err := Setup(*configDir)
 	if err != nil {
 		fmt.Println(err.Error())
 		Pause()
 	}
+
+	// Only override the CreateM3U8Playlist config option if the flag is explicitly provided
+	if createPlaylistFlagSet {
+		cfg.CreateM3U8Playlist = *createPlaylistFlag
+	}
+
+	// Print the configuration values
+	printConfig(cfg)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -74,7 +136,7 @@ func main() {
 	}()
 
 	if cfg.WriteErrorLog {
-		logFilePath, _, err := FindErrorLogFile()
+		logFilePath, _, err := FindErrorLogFile(*configDir)
 		if err != nil {
 			fmt.Println(err.Error())
 			Pause()
@@ -99,11 +161,6 @@ func main() {
 
 	app.bp = bp
 	app.bs = bs
-
-	quitFlag := flag.Bool("q", false, "Quit the main loop after finishing")
-
-	flag.Parse()
-	inputArgs := flag.Args()
 
 	for _, arg := range inputArgs {
 		if strings.HasSuffix(arg, ".txt") {

@@ -27,6 +27,7 @@ type AppConfig struct {
 	ForceReleaseDirectories bool   `yaml:"force_release_directories,omitempty"`
 	TrackExists             string `yaml:"track_exists,omitempty"`
 	TrackNumberPadding      int    `yaml:"track_number_padding,omitempty"`
+	CreateM3U8Playlist      bool   `yaml:"create_m3u8_playlist,omitempty"`
 
 	ReleaseDirectoryTemplate  string `yaml:"release_directory_template,omitempty"`
 	PlaylistDirectoryTemplate string `yaml:"playlist_directory_template,omitempty"`
@@ -96,6 +97,7 @@ func Parse(filePath string) (*AppConfig, error) {
 		ShowProgress:              true,
 		MaxGlobalWorkers:          15,
 		MaxDownloadWorkers:        15,
+		CreateM3U8Playlist:        false,
 	}
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {

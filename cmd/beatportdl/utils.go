@@ -200,10 +200,12 @@ func WorkingDirFilePath(fileName string) (string, error) {
 	return filePathCurrent, nil
 }
 
-func FindConfigFile() (string, bool, error) {
+func FindConfigFile(configDir string) (string, bool, error) {
 	var additionalDirs []string
 
-	if runtime.GOOS == "linux" {
+	if configDir != "" {
+		additionalDirs = append(additionalDirs, configDir)
+	} else if runtime.GOOS == "linux" {
 		var additionalDir string
 		if xdgCfgHome, exists := os.LookupEnv("XDG_CONFIG_HOME"); exists {
 			additionalDir = path.Join(xdgCfgHome, "beatportdl")
@@ -216,10 +218,12 @@ func FindConfigFile() (string, bool, error) {
 	return findFile(configFilename, additionalDirs)
 }
 
-func FindCacheFile() (string, bool, error) {
+func FindCacheFile(configDir string) (string, bool, error) {
 	var additionalDirs []string
 
-	if runtime.GOOS == "linux" {
+	if configDir != "" {
+		additionalDirs = append(additionalDirs, configDir)
+	} else if runtime.GOOS == "linux" {
 		var additionalDir string
 		if xdgCfgHome, exists := os.LookupEnv("XDG_STATE_HOME"); exists {
 			additionalDir = path.Join(xdgCfgHome, "beatportdl")
@@ -232,8 +236,13 @@ func FindCacheFile() (string, bool, error) {
 	return findFile(cacheFilename, additionalDirs)
 }
 
-func FindErrorLogFile() (string, bool, error) {
+func FindErrorLogFile(configDir string) (string, bool, error) {
 	var additionalDirs []string
+
+	if configDir != "" {
+		additionalDirs = append(additionalDirs, configDir)
+	}
+
 	return findFile(errorFilename, additionalDirs)
 }
 
@@ -275,5 +284,59 @@ func CreateDirectory(directory string) error {
 			return fmt.Errorf("create directory: %w", err)
 		}
 	}
+	return nil
+}
+
+// SanitizeFilename removes characters that are not allowed in filenames
+func SanitizeFilename(filename string) string {
+	// Replace invalid characters with underscores
+	invalidChars := []string{"/", "\\", ":", "*", "?", "\"", "<", ">", "|"}
+	result := filename
+
+	for _, char := range invalidChars {
+		result = strings.ReplaceAll(result, char, "_")
+	}
+
+	return result
+}
+
+// createM3U8Playlist creates an m3u8 playlist file from a list of track paths
+// The name parameter determines the name of the playlist file
+func (app *application) createM3U8Playlist(downloadsDir, name string, trackPaths []string) error {
+	if !app.config.CreateM3U8Playlist || len(trackPaths) <= 1 {
+		return nil
+	}
+
+	playlistName := SanitizeFilename(name)
+	playlistPath := filepath.Join(downloadsDir, playlistName+".m3u8")
+
+	// Create the playlist file
+	file, err := os.Create(playlistPath)
+	if err != nil {
+		return fmt.Errorf("failed to create playlist file: %w", err)
+	}
+	defer file.Close()
+
+	// Write the M3U8 header
+	if _, err := file.WriteString("#EXTM3U\n"); err != nil {
+		return fmt.Errorf("failed to write playlist header: %w", err)
+	}
+
+	// Write each track path as a relative path
+	basePath := filepath.Dir(playlistPath)
+	for _, track := range trackPaths {
+		// Convert to relative path if needed
+		relPath, err := filepath.Rel(basePath, track)
+		if err != nil {
+			relPath = track // Fall back to absolute path if we can't make it relative
+		}
+
+		// Write the track path
+		if _, err := file.WriteString(relPath + "\n"); err != nil {
+			return fmt.Errorf("failed to write track to playlist: %w", err)
+		}
+	}
+
+	app.LogInfo(fmt.Sprintf("Created playlist file: %s", playlistPath))
 	return nil
 }

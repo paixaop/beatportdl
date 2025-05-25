@@ -12,8 +12,8 @@ import (
 	"unspok3n/beatportdl/internal/beatport"
 )
 
-func Setup() (cfg *config.AppConfig, cachePath string, err error) {
-	configFilePath, exists, err := FindConfigFile()
+func Setup(configDir string) (cfg *config.AppConfig, cachePath string, err error) {
+	configFilePath, exists, err := FindConfigFile(configDir)
 	if err != nil {
 		return nil, "", err
 	}
@@ -64,7 +64,7 @@ func Setup() (cfg *config.AppConfig, cachePath string, err error) {
 		return nil, configFilePath, fmt.Errorf("load config: %w", err)
 	}
 
-	cacheFilePath, exists, err := FindCacheFile()
+	cacheFilePath, exists, err := FindCacheFile(configDir)
 	if err != nil {
 		return nil, configFilePath, fmt.Errorf("get executable path: %w", err)
 	}

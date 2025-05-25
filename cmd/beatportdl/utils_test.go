@@ -8,9 +8,10 @@ import (
 
 func TestFindConfigFile(t *testing.T) {
 	xdgConfigHome := "/tmp/foo/bar"
+	customConfigDir := "/custom/config/dir"
 
 	t.Run("Use default XDG_CONFIG_HOME without env being set", func(t *testing.T) {
-		configFilePath, _, gotErr := FindConfigFile()
+		configFilePath, _, gotErr := FindConfigFile("")
 		if gotErr != nil {
 			t.Errorf("FindConfigFile() failed: %v", gotErr)
 			return
@@ -26,7 +27,7 @@ func TestFindConfigFile(t *testing.T) {
 	t.Run("Use XDG_CONFIG_HOME with env being set", func(t *testing.T) {
 		os.Setenv("XDG_CONFIG_HOME", xdgConfigHome)
 
-		configFilePath, _, gotErr := FindConfigFile()
+		configFilePath, _, gotErr := FindConfigFile("")
 		if gotErr != nil {
 			t.Errorf("FindConfigFile() failed: %v", gotErr)
 			return
@@ -38,13 +39,28 @@ func TestFindConfigFile(t *testing.T) {
 			t.Errorf("Paths do not match %s != %s", expectedPath, configFilePath)
 		}
 	})
+
+	t.Run("Use custom config directory", func(t *testing.T) {
+		configFilePath, _, gotErr := FindConfigFile(customConfigDir)
+		if gotErr != nil {
+			t.Errorf("FindConfigFile() failed: %v", gotErr)
+			return
+		}
+
+		expectedPath := path.Join(customConfigDir, configFilename)
+
+		if expectedPath != configFilePath {
+			t.Errorf("Paths do not match %s != %s", expectedPath, configFilePath)
+		}
+	})
 }
 
 func TestFindCacheFile(t *testing.T) {
 	xdgStateHome := "/tmp/foo/bar"
+	customConfigDir := "/custom/config/dir"
 
 	t.Run("Use default XDG_STATE_HOME without env being set", func(t *testing.T) {
-		cacheFilePath, _, gotErr := FindCacheFile()
+		cacheFilePath, _, gotErr := FindCacheFile("")
 		if gotErr != nil {
 			t.Errorf("FindCacheFile() failed: %v", gotErr)
 			return
@@ -60,7 +76,7 @@ func TestFindCacheFile(t *testing.T) {
 	t.Run("Use XDG_STATE_HOME with env being set", func(t *testing.T) {
 		os.Setenv("XDG_STATE_HOME", xdgStateHome)
 
-		cacheFilePath, _, gotErr := FindCacheFile()
+		cacheFilePath, _, gotErr := FindCacheFile("")
 		if gotErr != nil {
 			t.Errorf("FindCacheFile() failed: %v", gotErr)
 			return
@@ -70,6 +86,20 @@ func TestFindCacheFile(t *testing.T) {
 
 		if expectedPath != cacheFilePath {
 			t.Errorf("Paths do not match, %s != %s", expectedPath, cacheFilePath)
+		}
+	})
+
+	t.Run("Use custom config directory", func(t *testing.T) {
+		cacheFilePath, _, gotErr := FindCacheFile(customConfigDir)
+		if gotErr != nil {
+			t.Errorf("FindCacheFile() failed: %v", gotErr)
+			return
+		}
+
+		expectedPath := path.Join(customConfigDir, cacheFilename)
+
+		if expectedPath != cacheFilePath {
+			t.Errorf("Paths do not match %s != %s", expectedPath, cacheFilePath)
 		}
 	})
 }
