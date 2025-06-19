@@ -1,0 +1,25 @@
+# Example tracks file for beatportdl
+# This file demonstrates support for both URLs and track IDs
+
+# Beatport URLs (these are processed regardless of -store flag)
+https://www.beatport.com/track/strobe/1696999
+https://www.beatport.com/track/move-for-me/591753
+
+# Beatsource URLs
+https://www.beatsource.com/track/some-track/123456
+
+# Track IDs (these will use the store specified by -store flag)
+# Deadmau5 - Strobe
+1696999
+
+# Cassius - I Love U So  
+591753
+
+# Another example track ID
+8472639
+
+# Empty lines and comments are ignored
+
+# You can mix URLs and track IDs in the same file
+# Use: ./beatportdl -store beatport example_tracks.txt
+# or:  ./beatportdl -store beatsource example_tracks.txt 

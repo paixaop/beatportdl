@@ -1,0 +1,130 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug beatportdl (Source)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/beatportdl",
+            "env": {},
+            "args": [],
+            "showLog": true,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug beatportdl (Binary)",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {},
+            "args": [],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Debug beatportdl (Interactive Mode)",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {},
+            "args": ["-i"],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Debug beatportdl with URL",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {},
+            "args": ["https://www.beatport.com/library"],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Debug beatportdl with Config",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {},
+            "args": ["-c", "${workspaceFolder}/config/config.json"],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Debug beatportdl (Verbose)",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {},
+            "args": ["-v", "-i"],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Debug beatportdl with Chrome (Visible)",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {
+                "BEATPORT_HEADLESS": "false"
+            },
+            "args": ["-playlist", "https://www.beatport.com/library"],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Debug Chrome Automation Only",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/bin/beatportdl-darwin-arm64-debug",
+            "env": {
+                "BEATPORT_HEADLESS": "false",
+                "DEBUG_CHROME": "true"
+            },
+            "args": ["https://www.beatport.com/library", "-v"],
+            "showLog": true,
+            "console": "integratedTerminal",
+            "preLaunchTask": "build-debug"
+        },
+        {
+            "name": "Attach to Process",
+            "type": "go",
+            "request": "attach",
+            "mode": "local",
+            "processId": 0
+        },
+        {
+            "name": "Debug Tests",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/cmd/beatportdl",
+            "showLog": true,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Current File",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${file}",
+            "showLog": true,
+            "console": "integratedTerminal"
+        }
+    ]
+} 
