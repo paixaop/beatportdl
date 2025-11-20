@@ -38,16 +38,17 @@ func (p *Playlist) DirectoryName(n NamingPreferences) string {
 
 	templateValues := map[string]string{
 		"id":           strconv.Itoa(int(p.ID)),
-		"name":         SanitizeForPath(p.Name),
-		"first_genre":  SanitizeForPath(firstGenre),
+		"name":         SanitizeForPath(p.Name, n.AsciiOnly),
+		"first_genre":  SanitizeForPath(firstGenre, n.AsciiOnly),
 		"track_count":  NumberWithPadding(p.TrackCount, p.TrackCount, n.TrackNumberPadding),
 		"bpm_range":    bpmRange,
 		"length":       p.LengthMs.Display(),
 		"created_date": p.CreatedDate.Format("2006-01-02"),
 		"updated_date": p.UpdatedDate.Format("2006-01-02"),
+		"first_artist": "",
 	}
 	directoryName := ParseTemplate(n.Template, templateValues)
-	return SanitizePath(directoryName, n.Whitespace)
+	return SanitizePath(directoryName, n.Whitespace, n.AsciiOnly)
 }
 
 func (b *Beatport) GetPlaylist(id int64) (*Playlist, error) {

@@ -22,12 +22,13 @@ type CollectionItem struct {
 func (c *Collection) DirectoryName(n NamingPreferences) string {
 	templateValues := map[string]string{
 		"id":           strconv.Itoa(int(c.ID)),
-		"name":         SanitizeForPath(c.Name),
+		"name":         SanitizeForPath(c.Name, n.AsciiOnly),
 		"track_count":  NumberWithPadding(c.TrackCount, c.TrackCount, n.TrackNumberPadding),
 		"updated_date": c.UpdatedDate.Format("2006-01-02"),
+		"first_artist": "",
 	}
 	directoryName := ParseTemplate(n.Template, templateValues)
-	return SanitizePath(directoryName, n.Whitespace)
+	return SanitizePath(directoryName, n.Whitespace, n.AsciiOnly)
 }
 
 func (b *Beatport) GetCollection() (*Collection, error) {

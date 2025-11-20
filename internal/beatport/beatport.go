@@ -7,18 +7,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-<<<<<<< HEAD
-=======
 	"reflect"
->>>>>>> 515bc7c (Initial commit)
 	"time"
 )
 
 const (
-<<<<<<< HEAD
-	beatportBaseUrl   = "https://api.beatport.com/v4"
-	beatsourceBaseUrl = "https://api.beatsource.com/v4"
-=======
 	// API Base URLs
 	BeatportAPIUrl   = "https://api.beatport.com/v4"
 	BeatsourceAPIUrl = "https://api.beatsource.com/v4"
@@ -33,7 +26,6 @@ const (
 	BeatportAPIDomain   = "api.beatport.com"
 	BeatsourceDomain    = "www.beatsource.com"
 	BeatsourceAPIDomain = "api.beatsource.com"
->>>>>>> 515bc7c (Initial commit)
 )
 
 type Beatport struct {
@@ -41,10 +33,7 @@ type Beatport struct {
 	client  *http.Client
 	headers map[string]string
 	auth    *Auth
-<<<<<<< HEAD
-=======
 	chrome  *ChromeDriver
->>>>>>> 515bc7c (Initial commit)
 }
 
 type FetcherError struct {
@@ -118,15 +107,9 @@ func (b *Beatport) fetch(method, endpoint string, payload interface{}, contentTy
 	var baseUrl string
 	switch b.store {
 	default:
-<<<<<<< HEAD
-		baseUrl = beatportBaseUrl
-	case StoreBeatsource:
-		baseUrl = beatsourceBaseUrl
-=======
 		baseUrl = BeatportAPIUrl
 	case StoreBeatsource:
 		baseUrl = BeatsourceAPIUrl
->>>>>>> 515bc7c (Initial commit)
 	}
 
 	req, err := http.NewRequest(method, baseUrl+endpoint, &body)
@@ -193,8 +176,6 @@ func encodeFormPayload(payload interface{}) (url.Values, error) {
 
 	return values, nil
 }
-<<<<<<< HEAD
-=======
 
 // InitializeChromeBrowser initializes Chrome browser for web automation
 func (b *Beatport) InitializeChromeBrowser(headless bool) error {
@@ -267,4 +248,3 @@ func (b *Beatport) ExtractTrackLinksFromPage(pageUrl string) ([]string, error) {
 
 	return b.chrome.ExtractTrackLinks()
 }
->>>>>>> 515bc7c (Initial commit)

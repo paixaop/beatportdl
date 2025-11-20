@@ -17,12 +17,13 @@ type Artists []Artist
 
 func (a *Artist) DirectoryName(n NamingPreferences) string {
 	templateValues := map[string]string{
-		"id":   strconv.Itoa(int(a.ID)),
-		"name": SanitizeForPath(a.Name),
-		"slug": a.Slug,
+		"id":           strconv.Itoa(int(a.ID)),
+		"name":         SanitizeForPath(a.Name, n.AsciiOnly),
+		"slug":         a.Slug,
+		"first_artist": "",
 	}
 	directoryName := ParseTemplate(n.Template, templateValues)
-	return SanitizePath(directoryName, n.Whitespace)
+	return SanitizePath(directoryName, n.Whitespace, n.AsciiOnly)
 }
 
 func (a *Artists) Display(limit int, shortForm string) string {

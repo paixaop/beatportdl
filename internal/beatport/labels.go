@@ -19,13 +19,14 @@ type Label struct {
 func (l *Label) DirectoryName(n NamingPreferences) string {
 	templateValues := map[string]string{
 		"id":           strconv.Itoa(int(l.ID)),
-		"name":         SanitizeForPath(l.Name),
+		"name":         SanitizeForPath(l.Name, n.AsciiOnly),
 		"slug":         l.Slug,
 		"created_date": l.Created.Format("2006-01-02"),
 		"updated_date": l.Updated.Format("2006-01-02"),
+		"first_artist": "",
 	}
 	directoryName := ParseTemplate(n.Template, templateValues)
-	return SanitizePath(directoryName, n.Whitespace)
+	return SanitizePath(directoryName, n.Whitespace, n.AsciiOnly)
 }
 
 func (l *Label) StoreUrl() string {

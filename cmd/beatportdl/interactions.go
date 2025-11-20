@@ -123,7 +123,6 @@ func (app *application) handleTrackIDForStore(trackID int64, store string) strin
 		return fmt.Sprintf("%s/track/track-name/%d", beatport.BeatsourceMainUrl, trackID)
 	default:
 		return fmt.Sprintf("%s/track/track-name/%d", beatport.BeatportMainUrl, trackID)
->>>>>>> 515bc7c (Initial commit)
 	}
 }
 
@@ -277,7 +276,6 @@ func (app *application) parseTextFileWithStore(path string, defaultStore string)
 		fmt.Printf("   🆔 Track IDs (%s): %d\n", storeName, trackIDCount)
 	}
 	fmt.Printf("   📊 Total items: %d\n", urlCount+trackIDCount)
->>>>>>> 515bc7c (Initial commit)
 }
 
 var (

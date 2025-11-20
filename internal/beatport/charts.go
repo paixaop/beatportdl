@@ -32,17 +32,18 @@ func (c *Chart) DirectoryName(n NamingPreferences) string {
 	}
 	templateValues := map[string]string{
 		"id":             strconv.Itoa(int(c.ID)),
-		"name":           SanitizeForPath(c.Name),
+		"name":           SanitizeForPath(c.Name, n.AsciiOnly),
 		"slug":           c.Slug,
-		"first_genre":    SanitizeForPath(firstGenre),
+		"first_genre":    SanitizeForPath(firstGenre, n.AsciiOnly),
 		"track_count":    NumberWithPadding(c.TrackCount, c.TrackCount, n.TrackNumberPadding),
-		"creator":        SanitizeForPath(c.Person.OwnerName),
+		"creator":        SanitizeForPath(c.Person.OwnerName, n.AsciiOnly),
+		"first_artist":   SanitizeForPath(c.Person.OwnerName, n.AsciiOnly),
 		"created_date":   c.AddDate.Format("2006-01-02"),
 		"published_date": c.PublishDate.Format("2006-01-02"),
 		"updated_date":   c.ChangeDate.Format("2006-01-02"),
 	}
 	directoryName := ParseTemplate(n.Template, templateValues)
-	return SanitizePath(directoryName, n.Whitespace)
+	return SanitizePath(directoryName, n.Whitespace, n.AsciiOnly)
 }
 
 func (b *Beatport) GetChart(id int64) (*Chart, error) {

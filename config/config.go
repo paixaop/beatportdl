@@ -12,20 +12,12 @@ import (
 )
 
 type AppConfig struct {
-<<<<<<< HEAD
-	Username      string `yaml:"username,omitempty"`
-	Password      string `yaml:"password,omitempty"`
-	Quality       string `yaml:"quality,omitempty"`
-	WriteErrorLog bool   `yaml:"write_error_log,omitempty"`
-	ShowProgress  bool   `yaml:"show_progress,omitempty"`
-=======
 	Username      string            `yaml:"username,omitempty"`
 	Password      string            `yaml:"password,omitempty"`
 	Cookies       map[string]string `yaml:"cookies,omitempty"`
 	Quality       string            `yaml:"quality,omitempty"`
 	WriteErrorLog bool              `yaml:"write_error_log,omitempty"`
 	ShowProgress  bool              `yaml:"show_progress,omitempty"`
->>>>>>> 515bc7c (Initial commit)
 
 	MaxGlobalWorkers   int `yaml:"max_global_workers,omitempty"`
 	MaxDownloadWorkers int `yaml:"max_download_workers,omitempty"`
@@ -49,9 +41,10 @@ type AppConfig struct {
 	ArtistsShortForm          string `yaml:"artists_short_form,omitempty"`
 	KeySystem                 string `yaml:"key_system,omitempty"`
 
-	CoverSize string `yaml:"cover_size,omitempty"`
-	KeepCover bool   `yaml:"keep_cover,omitempty"`
-	FixTags   bool   `yaml:"fix_tags,omitempty"`
+	CoverSize          string `yaml:"cover_size,omitempty"`
+	KeepCover          bool   `yaml:"keep_cover,omitempty"`
+	FixTags            bool   `yaml:"fix_tags,omitempty"`
+	AsciiOnlyFileNames bool   `yaml:"ascii_only_file_names,omitempty"`
 
 	TagMappings map[string]map[string]string `yaml:"tag_mappings,omitempty"`
 
@@ -91,11 +84,7 @@ func Parse(filePath string) (*AppConfig, error) {
 	config := AppConfig{
 		Quality:                   "lossless",
 		CoverSize:                 DefaultCoverSize,
-<<<<<<< HEAD
-		TrackFileTemplate:         "{number}. {artists} - {name} ({mix_name})",
-=======
 		TrackFileTemplate:         "{artists} - {track_name} ({mix_name})",
->>>>>>> 515bc7c (Initial commit)
 		ReleaseDirectoryTemplate:  "[{catalog_number}] {artists} - {name}",
 		PlaylistDirectoryTemplate: "{name} [{created_date}]",
 		ChartDirectoryTemplate:    "{name} [{published_date}]",
@@ -178,10 +167,6 @@ func (c *AppConfig) Save(filePath string) error {
 	}
 	return nil
 }
-<<<<<<< HEAD
-=======
-
 func FindConfigFile() (string, error) {
 	return "", nil
 }
->>>>>>> 515bc7c (Initial commit)

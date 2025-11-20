@@ -12,14 +12,6 @@ type LinkType string
 type Store string
 
 var (
-<<<<<<< HEAD
-	TrackLink    LinkType = "tracks"
-	ReleaseLink  LinkType = "releases"
-	PlaylistLink LinkType = "playlists"
-	ChartLink    LinkType = "charts"
-	LabelLink    LinkType = "labels"
-	ArtistLink   LinkType = "artists"
-=======
 	TrackLink      LinkType = "tracks"
 	ReleaseLink    LinkType = "releases"
 	PlaylistLink   LinkType = "playlists"
@@ -27,7 +19,6 @@ var (
 	LabelLink      LinkType = "labels"
 	ArtistLink     LinkType = "artists"
 	CollectionLink LinkType = "collection"
->>>>>>> 515bc7c (Initial commit)
 
 	StoreBeatport   Store = "beatport"
 	StoreBeatsource Store = "beatsource"
@@ -58,15 +49,9 @@ func (b *Beatport) ParseUrl(inputURL string) (*Link, error) {
 	}
 
 	switch u.Host {
-<<<<<<< HEAD
-	case "www.beatport.com", "api.beatport.com":
-		link.Store = StoreBeatport
-	case "www.beatsource.com", "api.beatsource.com":
-=======
 	case BeatportDomain, BeatportAPIDomain:
 		link.Store = StoreBeatport
 	case BeatsourceDomain, BeatsourceAPIDomain:
->>>>>>> 515bc7c (Initial commit)
 		link.Store = StoreBeatsource
 	default:
 		return nil, ErrInvalidUrl
@@ -96,8 +81,6 @@ func (b *Beatport) ParseUrl(inputURL string) (*Link, error) {
 		idSegment = 2
 		link.Type = ReleaseLink
 	case "library":
-<<<<<<< HEAD
-=======
 		// Handle /library URL without ID (for collection)
 		if segmentsLength == 1 {
 			link.Type = CollectionLink
@@ -105,7 +88,6 @@ func (b *Beatport) ParseUrl(inputURL string) (*Link, error) {
 			link.Params = u.RawQuery
 			return &link, nil
 		}
->>>>>>> 515bc7c (Initial commit)
 		switch segments[1] {
 		case "playlists", "playlist":
 			idSegment = 2

@@ -50,7 +50,7 @@ This will create a new `beatportdl-config.yml` file. You can put the following o
 | `keep_cover`                  | false                                     | Boolean    | Download cover art file (cover.jpg) to the context directory (requires `sort_by_context`)                                                                                                 |
 | `fix_tags`                    | true                                      | Boolean    | Enable tag writing capabilities                                                                                                                                                           |
 | `tag_mappings`                | _Listed below_                            | String Map | Custom tag mappings                                                                                                                                                                       |
-| `track_file_template`         | {number}. {artists} - {name} ({mix_name}) | String     | Track filename template                                                                                                                                                                   |
+| `track_file_template`         | {number}. {artists} - {name} ({mix_name}) | String     | Track filename template (supports path templates with "/" for directory creation)                                                                                                       |
 | `release_directory_template`  | [{catalog_number}] {artists} - {name}     | String     | Release directory template                                                                                                                                                                |
 | `playlist_directory_template` | {name} [{created_date}]                   | String     | Playlist directory template                                                                                                                                                               |
 | `chart_directory_template`    | {name} [{published_date}]                 | String     | Chart directory template                                                                                                                                                                  |
@@ -60,6 +60,7 @@ This will create a new `beatportdl-config.yml` file. You can put the following o
 | `artists_limit`               | 3                                         | Integer    | Maximum number of artists allowed before replacing with `artists_short_form` (affects directories, filenames, and search results)                                                         |
 | `artists_short_form`          | VA                                        | String     | Custom string to represent "Various Artists"                                                                                                                                              |
 | `key_system`                  | standard-short                            | String     | Music key system used in filenames and tags                                                                                                                                               |
+| `ascii_only_file_names`       | false                                     | Boolean    | Convert all filenames and directory names to pure ASCII (removes accents, converts Unicode to ASCII equivalents)                                                                       |
 | `proxy`                       |                                           | String     | Proxy URL                                                                                                                                                                                 |
 
 If the Beatport credentials are correct, you should also see the file `beatportdl-credentials.json` appear in the BeatportDL directory.
@@ -83,12 +84,14 @@ Available `track_exists` options:
 
 Available template keywords for filenames and directories (`*_template`):
 
-- Track: `id`,`name`,`mix_name`,`slug`,`artists`,`remixers`,`number`,`length`,`key`,`bpm`,`genre`,`subgenre`,`genre_with_subgenre`,`subgenre_or_genre`,`isrc`,`label`
-- Release: `id`,`name`,`slug`,`artists`,`remixers`,`date`,`year`,`track_count`,`bpm_range`,`catalog_number`,`upc`,`label`
+- Track: `id`,`name`,`mix_name`,`slug`,`artists`,`first_artist`,`remixers`,`number`,`length`,`key`,`bpm`,`genre`,`subgenre`,`genre_with_subgenre`,`subgenre_or_genre`,`isrc`,`label`
+- Release: `id`,`name`,`slug`,`artists`,`first_artist`,`remixers`,`date`,`year`,`track_count`,`bpm_range`,`catalog_number`,`upc`,`label`
 - Playlist: `id`,`name`,`first_genre`,`track_count`,`bpm_range`,`length`,`created_date`,`updated_date`
-- Chart: `id`,`name`,`slug`,`first_genre`,`track_count`,`creator`,`created_date`,`published_date`,`updated_date`
+- Chart: `id`,`name`,`slug`,`first_genre`,`track_count`,`creator`,`first_artist`,`created_date`,`published_date`,`updated_date`
 - Artist: `id`, `name`, `slug`
 - Label: `id`, `name`, `slug`, `created_date`, `updated_date`
+
+**Path Templates**: The `track_file_template` supports directory creation by using "/" in the template. Everything before the last "/" creates directory paths, and everything after becomes the filename. Example: `{year}/{first_artist}/{artists} - {track_name} ({mix_name})`
 
 Default `tag_mappings` config:
 
@@ -151,26 +154,40 @@ Available `key_system` options:
 
 Proxy URL format example: `http://username:password@127.0.0.1:8080`
 
+## New Features
+
+### ASCII Filename Sanitization
+When `ascii_only_file_names` is set to `true`, all filenames and directory names are converted to pure ASCII by:
+- Removing accents and diacritics (café → cafe, naïve → naive)
+- Converting Unicode characters to ASCII equivalents (北京 → Bei Jing)
+- Removing characters that don't have ASCII equivalents
+
+### First Artist Template Variable
+The `first_artist` template variable extracts the first artist from artist lists, useful for cleaner directory structures. It:
+- Takes the first artist from comma-separated lists
+- Handles "Artist1 & Artist2" format by taking "Artist1"
+- Cleans up track numbers and prefixes
+- Returns "Unknown" if no valid artist is found
+
+**Examples:**
+- `"David Guetta & Bebe Rexha"` → `"David Guetta"`
+- `"Calvin Harris, Disciples"` → `"Calvin Harris"`
+- `"50 Cent"` → `"Cent"`
+- `"12. Artist Name"` → `"Artist Name"`
+
+### Path Templates for Directory Organization
+The `track_file_template` now supports automatic directory creation using "/" in the template:
+
+**Syntax:** `{directory}/{subdirectory}/{filename}`
+
+**Example Template:** `{year}/{first_artist}/{artists} - {track_name} ({mix_name})`
+- Creates: `2024/David Guetta/` directory
+- Filename: `David Guetta & Bebe Rexha - Don't You Worry (Extended).flac`
+
+This enables sophisticated organization schemes like organizing by year, artist, or any combination of template variables.
+
 ## Usage
 
-<<<<<<< HEAD
-Run BeatportDL and enter Beatport or Beatsource URL or search query:
-
-```shell
-./beatportdl
-Enter url or search query:
-```
-
-By default, search returns the results from beatport, if you want to search on beatsource instead, include `@beatsource` tag in the query
-
-...or specify the URL using positional arguments:
-
-```shell
-./beatportdl https://www.beatport.com/track/strobe/1696999 https://www.beatport.com/track/move-for-me/591753
-```
-
-...or provide a text file with urls (separated by a newline)
-=======
 Run BeatportDL and enter Beatport or Beatsource URL, track ID, or search query:
 
 ```shell
@@ -205,14 +222,11 @@ For track IDs specified via command line, use the `-store` flag to choose the st
 ### Text File Support
 
 Provide text files with URLs and/or track IDs (separated by newlines):
->>>>>>> 515bc7c (Initial commit)
 
 ```shell
 ./beatportdl file.txt file2.txt
 ```
 
-<<<<<<< HEAD
-=======
 **Example text file (tracks.txt):**
 ```
 # Beatport URLs
@@ -234,16 +248,14 @@ Use the `-store` flag to specify which store to use for track IDs in text files:
 # All track IDs in file will be treated as Beatport tracks
 ./beatportdl -store beatport tracks.txt
 
-# All track IDs in file will be treated as Beatsource tracks  
+# All track IDs in file will be treated as Beatsource tracks
 ./beatportdl -store beatsource tracks.txt
 ```
 
-**Note:** 
+**Note:**
 - Empty lines and lines starting with `#` are ignored (comments)
 - URLs are processed as-is regardless of the `-store` flag
 - Track IDs use the store specified by `-store` flag (default: beatport)
-
->>>>>>> 515bc7c (Initial commit)
 Available command line arguments:
 
 ```
@@ -253,11 +265,8 @@ Available command line arguments:
     Quit the main loop after finishing
 -playlist
     Create an m3u8 playlist file when multiple tracks are downloaded from a single URL
-<<<<<<< HEAD
-=======
 -store string
     Store to use for track IDs: 'beatport' or 'beatsource' (default: beatport)
->>>>>>> 515bc7c (Initial commit)
 ```
 
 URL types that are currently supported: **Tracks, Releases, Playlists, Charts, Labels, Artists**

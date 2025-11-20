@@ -7,10 +7,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
-<<<<<<< HEAD
-=======
 	"strconv"
->>>>>>> 515bc7c (Initial commit)
 	"strings"
 	"sync"
 	"syscall"
@@ -77,6 +74,7 @@ func printConfig(cfg *config.AppConfig) {
 	fmt.Printf("Cover Size: %s\n", cfg.CoverSize)
 	fmt.Printf("Keep Cover: %t\n", cfg.KeepCover)
 	fmt.Printf("Fix Tags: %t\n", cfg.FixTags)
+	fmt.Printf("ASCII Only File Names: %t\n", cfg.AsciiOnlyFileNames)
 
 	if cfg.Proxy != "" {
 		fmt.Printf("Using Proxy: %s\n", cfg.Proxy)
@@ -91,10 +89,7 @@ func main() {
 	configDir := flag.String("config-dir", "", "Directory to load configuration files from (beatportdl-config.yml and beatportdl-credentials.json)")
 	quitFlag := flag.Bool("q", false, "Quit the main loop after finishing")
 	createPlaylistFlag := flag.Bool("playlist", false, "Create an m3u8 playlist file when multiple tracks are downloaded from a single URL")
-<<<<<<< HEAD
-=======
 	storeFlag := flag.String("store", "beatport", "Store to use for track IDs: 'beatport' or 'beatsource' (default: beatport)")
->>>>>>> 515bc7c (Initial commit)
 
 	flag.Parse()
 	inputArgs := flag.Args()
@@ -113,8 +108,6 @@ func main() {
 		Pause()
 	}
 
-<<<<<<< HEAD
-=======
 	// Get the config file path for saving cookies
 	configFilePath, _, err := FindConfigFile(*configDir)
 	if err != nil {
@@ -122,7 +115,6 @@ func main() {
 		Pause()
 	}
 
->>>>>>> 515bc7c (Initial commit)
 	// Only override the CreateM3U8Playlist config option if the flag is explicitly provided
 	if createPlaylistFlagSet {
 		cfg.CreateM3U8Playlist = *createPlaylistFlag
@@ -135,10 +127,7 @@ func main() {
 
 	app := &application{
 		config:      cfg,
-<<<<<<< HEAD
-=======
 		configPath:  configFilePath,
->>>>>>> 515bc7c (Initial commit)
 		downloadSem: make(chan struct{}, cfg.MaxDownloadWorkers),
 		globalSem:   make(chan struct{}, cfg.MaxGlobalWorkers),
 		ctx:         ctx,
@@ -188,11 +177,6 @@ func main() {
 	app.bp = bp
 	app.bs = bs
 
-<<<<<<< HEAD
-	for _, arg := range inputArgs {
-		if strings.HasSuffix(arg, ".txt") {
-			app.parseTextFile(arg)
-=======
 	// Helper function to handle track IDs for command line arguments
 	handleTrackIDForStore := func(trackID int64, store string) string {
 		switch strings.ToLower(store) {
@@ -211,7 +195,6 @@ func main() {
 			trackURL := handleTrackIDForStore(trackID, *storeFlag)
 			app.urls = append(app.urls, trackURL)
 			fmt.Printf("✅ Added track ID %d from %s to download queue\n", trackID, *storeFlag)
->>>>>>> 515bc7c (Initial commit)
 		} else {
 			app.urls = append(app.urls, arg)
 		}

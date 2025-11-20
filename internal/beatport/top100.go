@@ -31,9 +31,6 @@ func (b *Beatport) GetTop100(ctx context.Context, id int64) (*Top100, error) {
 		endpoint = fmt.Sprintf("/catalog/genres/%d/top-100", id)
 	}
 
-<<<<<<< HEAD
-	req, err := http.NewRequestWithContext(ctx, "GET", b.ApiUrl(endpoint), nil)
-=======
 	// Create request with context
 	var baseUrl string
 	switch b.store {
@@ -44,14 +41,10 @@ func (b *Beatport) GetTop100(ctx context.Context, id int64) (*Top100, error) {
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", baseUrl+endpoint, nil)
->>>>>>> 515bc7c (Initial commit)
 	if err != nil {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	resp, err := b.Do(req)
-=======
 	// Add headers and auth
 	for key, value := range b.headers {
 		req.Header.Add(key, value)
@@ -62,7 +55,6 @@ func (b *Beatport) GetTop100(ctx context.Context, id int64) (*Top100, error) {
 
 	// Execute request
 	resp, err := b.client.Do(req)
->>>>>>> 515bc7c (Initial commit)
 	if err != nil {
 		return nil, err
 	}
@@ -100,12 +92,6 @@ func (b *Beatport) GetTop100(ctx context.Context, id int64) (*Top100, error) {
 
 	// If this is a genre-specific top-100, add the genre info
 	if id > 0 {
-<<<<<<< HEAD
-		// Fetch the genre name
-		genre, err := b.GetGenre(ctx, id)
-		if err == nil && genre != nil {
-			top100.GenreName = genre.Name
-=======
 		// Fetch the genre name using the basic genre struct
 		var genre Genre
 		genreEndpoint := fmt.Sprintf("/catalog/genres/%d/", id)
@@ -126,7 +112,6 @@ func (b *Beatport) GetTop100(ctx context.Context, id int64) (*Top100, error) {
 					top100.GenreName = genre.Name
 				}
 			}
->>>>>>> 515bc7c (Initial commit)
 		}
 	}
 
@@ -166,12 +151,8 @@ func (b *Beatport) GetTop100(ctx context.Context, id int64) (*Top100, error) {
 	return top100, nil
 }
 
-<<<<<<< HEAD
-=======
 // Define the Top100Link constant
 const Top100Link LinkType = "top100"
-
->>>>>>> 515bc7c (Initial commit)
 // GetTop100FromLink fetches a top-100 list from a Beatport link
 func (b *Beatport) GetTop100FromLink(ctx context.Context, link *Link) (*Top100, error) {
 	if link.Type != Top100Link {
@@ -181,8 +162,6 @@ func (b *Beatport) GetTop100FromLink(ctx context.Context, link *Link) (*Top100, 
 	return b.GetTop100(ctx, link.ID)
 }
 
-<<<<<<< HEAD
-=======
 // Define DownloadOptions struct
 type DownloadOptions struct {
 	Quality      string
@@ -191,8 +170,6 @@ type DownloadOptions struct {
 	TotalTracks  int
 	SkipExisting bool
 }
-
->>>>>>> 515bc7c (Initial commit)
 // DownloadTop100 downloads all tracks from a top-100 list
 func (b *Beatport) DownloadTop100(ctx context.Context, top100 *Top100, options *DownloadOptions) error {
 	totalTracks := len(top100.Tracks)
@@ -225,13 +202,9 @@ func (b *Beatport) DownloadTop100(ctx context.Context, top100 *Top100, options *
 		trackOptions.Position = position
 		trackOptions.TotalTracks = totalTracks
 
-<<<<<<< HEAD
-		if err := b.DownloadTrack(ctx, &track, &trackOptions); err != nil {
-=======
 		// Download track using the track ID and quality
 		_, err := b.DownloadTrack(track.ID, trackOptions.Quality)
 		if err != nil {
->>>>>>> 515bc7c (Initial commit)
 			return err
 		}
 	}

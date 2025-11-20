@@ -45,6 +45,7 @@ func (app *application) setupDownloadsDirectory(baseDir string, entity Downloads
 					ArtistsLimit:       app.config.ArtistsLimit,
 					ArtistsShortForm:   app.config.ArtistsShortForm,
 					TrackNumberPadding: app.config.TrackNumberPadding,
+					AsciiOnly:          app.config.AsciiOnlyFileNames,
 				},
 			)
 			if app.config.SortByLabel && entity != nil {
@@ -56,6 +57,7 @@ func (app *application) setupDownloadsDirectory(baseDir string, entity Downloads
 					Template:           app.config.PlaylistDirectoryTemplate,
 					Whitespace:         app.config.WhitespaceCharacter,
 					TrackNumberPadding: app.config.TrackNumberPadding,
+					AsciiOnly:          app.config.AsciiOnlyFileNames,
 				},
 			)
 		case *beatport.Chart:
@@ -64,6 +66,7 @@ func (app *application) setupDownloadsDirectory(baseDir string, entity Downloads
 					Template:           app.config.ChartDirectoryTemplate,
 					Whitespace:         app.config.WhitespaceCharacter,
 					TrackNumberPadding: app.config.TrackNumberPadding,
+					AsciiOnly:          app.config.AsciiOnlyFileNames,
 				},
 			)
 		case *beatport.Label:
@@ -71,6 +74,7 @@ func (app *application) setupDownloadsDirectory(baseDir string, entity Downloads
 				beatport.NamingPreferences{
 					Template:   app.config.LabelDirectoryTemplate,
 					Whitespace: app.config.WhitespaceCharacter,
+					AsciiOnly:  app.config.AsciiOnlyFileNames,
 				},
 			)
 		case *beatport.Artist:
@@ -78,10 +82,9 @@ func (app *application) setupDownloadsDirectory(baseDir string, entity Downloads
 				beatport.NamingPreferences{
 					Template:   app.config.ArtistDirectoryTemplate,
 					Whitespace: app.config.WhitespaceCharacter,
+					AsciiOnly:  app.config.AsciiOnlyFileNames,
 				},
 			)
-<<<<<<< HEAD
-=======
 		case *beatport.Collection:
 			subDir = castedEntity.DirectoryName(
 				beatport.NamingPreferences{
@@ -90,7 +93,6 @@ func (app *application) setupDownloadsDirectory(baseDir string, entity Downloads
 					TrackNumberPadding: app.config.TrackNumberPadding,
 				},
 			)
->>>>>>> 515bc7c (Initial commit)
 		}
 		baseDir = filepath.Join(baseDir, subDir)
 	}
@@ -171,14 +173,50 @@ func (app *application) saveTrack(inst *beatport.Beatport, track *beatport.Track
 		download = trackDownload
 	}
 
+	// Handle path templates: if template contains "/", split into directory path and filename
+	template := app.config.TrackFileTemplate
+	var fileTemplate string
+	var pathTemplate string
+
+	if lastSlashIndex := strings.LastIndex(template, "/"); lastSlashIndex >= 0 {
+		pathTemplate = template[:lastSlashIndex]
+		fileTemplate = template[lastSlashIndex+1:]
+	} else {
+		fileTemplate = template
+	}
+
+	// Create directory structure if path template exists
+	if pathTemplate != "" {
+		// Parse the path template to get directory names
+		pathName := track.Filename(
+			beatport.NamingPreferences{
+				Template:           pathTemplate,
+				Whitespace:         app.config.WhitespaceCharacter,
+				ArtistsLimit:       app.config.ArtistsLimit,
+				ArtistsShortForm:   app.config.ArtistsShortForm,
+				TrackNumberPadding: app.config.TrackNumberPadding,
+				KeySystem:          app.config.KeySystem,
+				AsciiOnly:          app.config.AsciiOnlyFileNames,
+			},
+		)
+
+		// Create the full directory path
+		fullPath := filepath.Join(directory, pathName)
+		if err := CreateDirectory(fullPath); err != nil {
+			return "", fmt.Errorf("failed to create directory %s: %w", fullPath, err)
+		}
+		directory = fullPath
+	}
+
 	fileName := track.Filename(
 		beatport.NamingPreferences{
-			Template:           app.config.TrackFileTemplate,
+			Template:           fileTemplate,
 			Whitespace:         app.config.WhitespaceCharacter,
 			ArtistsLimit:       app.config.ArtistsLimit,
 			ArtistsShortForm:   app.config.ArtistsShortForm,
 			TrackNumberPadding: app.config.TrackNumberPadding,
 			KeySystem:          app.config.KeySystem,
+			AsciiOnly:          app.config.AsciiOnlyFileNames,
 		},
 	)
 	filePath := fmt.Sprintf("%s/%s%s", directory, fileName, fileExtension)
@@ -597,6 +635,7 @@ func (app *application) handleReleaseLink(inst *beatport.Beatport, link *beatpor
 				ArtistsLimit:       app.config.ArtistsLimit,
 				ArtistsShortForm:   app.config.ArtistsShortForm,
 				TrackNumberPadding: app.config.TrackNumberPadding,
+				AsciiOnly:          app.config.AsciiOnlyFileNames,
 			},
 		)
 
@@ -703,6 +742,7 @@ func (app *application) handlePlaylistLink(inst *beatport.Beatport, link *beatpo
 				Template:           app.config.PlaylistDirectoryTemplate,
 				Whitespace:         app.config.WhitespaceCharacter,
 				TrackNumberPadding: app.config.TrackNumberPadding,
+				AsciiOnly:          app.config.AsciiOnlyFileNames,
 			},
 		)
 
@@ -820,6 +860,7 @@ func (app *application) handleChartLink(inst *beatport.Beatport, link *beatport.
 				Template:           app.config.ChartDirectoryTemplate,
 				Whitespace:         app.config.WhitespaceCharacter,
 				TrackNumberPadding: app.config.TrackNumberPadding,
+				AsciiOnly:          app.config.AsciiOnlyFileNames,
 			},
 		)
 
@@ -913,6 +954,7 @@ func (app *application) handleLabelLink(inst *beatport.Beatport, link *beatport.
 						ArtistsLimit:       app.config.ArtistsLimit,
 						ArtistsShortForm:   app.config.ArtistsShortForm,
 						TrackNumberPadding: app.config.TrackNumberPadding,
+						AsciiOnly:          app.config.AsciiOnlyFileNames,
 					},
 				)
 
@@ -1238,4 +1280,3 @@ func (app *application) handleCollectionLink(inst *beatport.Beatport, link *beat
 
 	app.cleanup(downloadsDir)
 }
->>>>>>> 515bc7c (Initial commit)

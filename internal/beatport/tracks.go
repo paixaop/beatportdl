@@ -5,10 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-<<<<<<< HEAD
-=======
 	"time"
->>>>>>> 515bc7c (Initial commit)
 )
 
 type Track struct {
@@ -69,10 +66,6 @@ func (t *Track) Filename(n NamingPreferences) string {
 		subgenre = t.Subgenre.Name
 	}
 
-<<<<<<< HEAD
-	templateValues := map[string]string{
-		"id":                  strconv.Itoa(int(t.ID)),
-=======
 	// Parse release date for individual components
 	releaseDay, releaseMonth, releaseYear := "", "", ""
 	if releaseDateParsed, err := time.Parse("2006-01-02", t.Release.Date); err == nil {
@@ -93,25 +86,23 @@ func (t *Track) Filename(n NamingPreferences) string {
 	templateValues := map[string]string{
 		"track_id":            strconv.Itoa(int(t.ID)),
 		"id":                  strconv.Itoa(int(t.ID)),
-		"track_name":          SanitizeForPath(t.Name.String()),
->>>>>>> 515bc7c (Initial commit)
-		"name":                SanitizeForPath(t.Name.String()),
+		"track_name":          SanitizeForPath(t.Name.String(), n.AsciiOnly),
+		"name":                SanitizeForPath(t.Name.String(), n.AsciiOnly),
 		"slug":                t.Slug,
-		"mix_name":            SanitizeForPath(t.MixName.String()),
-		"artists":             SanitizeForPath(artistsString),
-		"remixers":            SanitizeForPath(remixersString),
+		"mix_name":            SanitizeForPath(t.MixName.String(), n.AsciiOnly),
+		"artists":             SanitizeForPath(artistsString, n.AsciiOnly),
+		"first_artist":        SanitizeForPath(ExtractFirstArtist(artistsString), n.AsciiOnly),
+		"remixers":            SanitizeForPath(remixersString, n.AsciiOnly),
 		"number":              NumberWithPadding(t.Number, t.Release.TrackCount, n.TrackNumberPadding),
 		"length":              t.LengthMs.Display(),
 		"key":                 t.Key.Display(n.KeySystem),
 		"bpm":                 strconv.Itoa(t.BPM),
-		"genre":               SanitizeForPath(t.Genre.Name),
-		"subgenre":            SanitizeForPath(subgenre),
-		"genre_with_subgenre": SanitizeForPath(t.GenreWithSubgenre("-")),
-		"subgenre_or_genre":   SanitizeForPath(t.SubgenreOrGenre()),
+		"genre":               SanitizeForPath(t.Genre.Name, n.AsciiOnly),
+		"subgenre":            SanitizeForPath(subgenre, n.AsciiOnly),
+		"genre_with_subgenre": SanitizeForPath(t.GenreWithSubgenre("-"), n.AsciiOnly),
+		"subgenre_or_genre":   SanitizeForPath(t.SubgenreOrGenre(), n.AsciiOnly),
 		"isrc":                t.ISRC,
-		"label":               SanitizeForPath(t.Release.Label.Name),
-<<<<<<< HEAD
-=======
+		"label":               SanitizeForPath(t.Release.Label.Name, n.AsciiOnly),
 		"release_day":         releaseDay,
 		"release_month":       releaseMonth,
 		"release_year":        releaseYear,
@@ -121,10 +112,9 @@ func (t *Track) Filename(n NamingPreferences) string {
 		"download_day":        downloadDay,
 		"download_month":      downloadMonth,
 		"download_year":       downloadYear,
->>>>>>> 515bc7c (Initial commit)
 	}
 	fileName := ParseTemplate(n.Template, templateValues)
-	return SanitizePath(fileName, n.Whitespace)
+	return SanitizePath(fileName, n.Whitespace, n.AsciiOnly)
 }
 
 func (b *Beatport) GetTrack(id int64) (*Track, error) {

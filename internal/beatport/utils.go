@@ -6,6 +6,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	unicode2 "unicode"
+
+	"github.com/mozillazg/go-unidecode"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 type SanitizedString string
@@ -17,6 +25,7 @@ type NamingPreferences struct {
 	ArtistsShortForm   string
 	TrackNumberPadding int
 	KeySystem          string
+	AsciiOnly          bool
 }
 
 func (d *Duration) Display() string {
@@ -46,7 +55,8 @@ func (s *SanitizedString) String() string {
 	return string(*s)
 }
 
-func SanitizeForPath(s string) string {
+func SanitizeForPath(s string, sanitize bool) string {
+
 	r := strings.NewReplacer(
 		"\\", "",
 		"/", "",
@@ -54,9 +64,15 @@ func SanitizeForPath(s string) string {
 	return strings.Join(strings.Fields(r.Replace(s)), " ")
 }
 
-func SanitizePath(name string, whitespace string) string {
+func SanitizePath(name string, whitespace string, asciiOnly bool) string {
+
 	if len(name) > 250 {
 		name = name[:250]
+	}
+
+	// Convert to ASCII if requested
+	if asciiOnly {
+		name = toASCII(name)
 	}
 
 	oldnew := []string{
@@ -77,6 +93,69 @@ func SanitizePath(name string, whitespace string) string {
 	name = r.Replace(name)
 
 	return strings.Join(strings.Fields(name), " ")
+}
+
+// toASCII converts a string to pure ASCII by using robust Unicode normalization and transliteration
+func toASCII(s string) string {
+	if s == "" {
+		return s
+	}
+
+	// Step 1: Unicode normalization (NFKD) to decompose characters
+	normalized := norm.NFKD.String(s)
+
+	// Step 2: Remove combining marks (diacritics) - category Mn (Mark, nonspacing)
+	// This removes accents, umlauts, etc.
+	removeMarks := runes.Remove(runes.In(unicode2.Mn))
+	noMarks, _, err := transform.String(removeMarks, normalized)
+	if err != nil {
+		// Fallback: if transformation fails, use the normalized string
+		noMarks = normalized
+	}
+
+	// Step 3: Use unidecode library for comprehensive transliteration
+	// This handles characters that aren't covered by normalization alone
+	ascii := unidecode.Unidecode(noMarks)
+
+	// Step 4: Final cleanup - ensure only ASCII characters remain
+	// Remove any remaining non-ASCII characters (though unidecode should handle most)
+	var result strings.Builder
+	for _, r := range ascii {
+		if r <= unicode2.MaxASCII && unicode2.IsPrint(r) {
+			result.WriteRune(r)
+		}
+		// Skip non-printable characters and any remaining non-ASCII
+	}
+
+	return result.String()
+}
+
+// ExtractFirstArtist extracts the first artist from a formatted artist string
+func ExtractFirstArtist(artistString string) string {
+	// Use 'Unknown' if artistString is empty
+	if artistString == "" {
+		artistString = "Unknown"
+	}
+
+	// Replace '&' with ','
+	artistString = strings.ReplaceAll(artistString, "&", ",")
+
+	// Split on comma and take first part
+	parts := strings.SplitN(artistString, ",", 2)
+	firstArtist := strings.TrimSpace(parts[0])
+
+	// Remove leading digits, spaces, dots, dashes, underscores, parentheses, brackets
+	charsToStrip := " -_()[]"
+	firstArtist = strings.TrimLeft(firstArtist, charsToStrip)
+
+	// Use 'Unknown' if result is empty
+	if firstArtist == "" {
+		firstArtist = "Unknown"
+	}
+
+	// Title case the result
+	caser := cases.Title(language.Und, cases.NoLower)
+	return caser.String(firstArtist)
 }
 
 func NumberWithPadding(value, total, padding int) string {
