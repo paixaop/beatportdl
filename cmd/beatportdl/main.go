@@ -69,12 +69,18 @@ func printConfig(cfg *config.AppConfig) {
 	fmt.Printf("Create M3U8 Playlist: %t\n", cfg.CreateM3U8Playlist)
 
 	fmt.Printf("Track File Template: %s\n", cfg.TrackFileTemplate)
+	fmt.Printf("Release Directory Template: %s\n", cfg.ReleaseDirectoryTemplate)
+	fmt.Printf("Playlist Directory Template: %s\n", cfg.PlaylistDirectoryTemplate)
+	fmt.Printf("Chart Directory Template: %s\n", cfg.ChartDirectoryTemplate)
+	fmt.Printf("Label Directory Template: %s\n", cfg.LabelDirectoryTemplate)
+	fmt.Printf("Artist Directory Template: %s\n", cfg.ArtistDirectoryTemplate)
+	fmt.Printf("ASCII Only File Names: %t\n", cfg.AsciiOnlyFileNames)
+
 	fmt.Printf("Key System: %s\n", cfg.KeySystem)
 
 	fmt.Printf("Cover Size: %s\n", cfg.CoverSize)
 	fmt.Printf("Keep Cover: %t\n", cfg.KeepCover)
 	fmt.Printf("Fix Tags: %t\n", cfg.FixTags)
-	fmt.Printf("ASCII Only File Names: %t\n", cfg.AsciiOnlyFileNames)
 
 	if cfg.Proxy != "" {
 		fmt.Printf("Using Proxy: %s\n", cfg.Proxy)

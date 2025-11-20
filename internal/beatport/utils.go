@@ -137,8 +137,8 @@ func ExtractFirstArtist(artistString string) string {
 		artistString = "Unknown"
 	}
 
-	// Replace '&' with ','
-	artistString = strings.ReplaceAll(artistString, "&", ",")
+	// Replace '&' with ',' only if it is surrounded by spaces (i.e., by itself)
+	artistString = regexp.MustCompile(`\s&\s`).ReplaceAllString(artistString, ",")
 
 	// Split on comma and take first part
 	parts := strings.SplitN(artistString, ",", 2)
