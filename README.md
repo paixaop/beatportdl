@@ -172,8 +172,6 @@ The `first_artist` template variable extracts the first artist from artist lists
 **Examples:**
 - `"David Guetta & Bebe Rexha"` → `"David Guetta"`
 - `"Calvin Harris, Disciples"` → `"Calvin Harris"`
-- `"50 Cent"` → `"Cent"`
-- `"12. Artist Name"` → `"Artist Name"`
 
 ### Path Templates for Directory Organization
 The `track_file_template` now supports automatic directory creation using "/" in the template:

@@ -202,10 +202,15 @@ func (app *application) saveTrack(inst *beatport.Beatport, track *beatport.Track
 
 		// Create the full directory path
 		fullPath := filepath.Join(directory, pathName)
-		if err := CreateDirectory(fullPath); err != nil {
-			return "", fmt.Errorf("failed to create directory %s: %w", fullPath, err)
+
+		// Avoid creating duplicate directories (e.g., when playlist name == first_artist)
+		if filepath.Base(directory) != pathName {
+			if err := CreateDirectory(fullPath); err != nil {
+				return "", fmt.Errorf("failed to create directory %s: %w", fullPath, err)
+			}
+			directory = fullPath
 		}
-		directory = fullPath
+		// If pathName duplicates the current directory name, skip creating the subdirectory
 	}
 
 	fileName := track.Filename(
