@@ -29,10 +29,7 @@ const (
 
 type application struct {
 	config      *config.AppConfig
-<<<<<<< HEAD
-=======
 	configPath  string
->>>>>>> 515bc7c (Initial commit)
 	logFile     *os.File
 	logWriter   io.Writer
 	ctx         context.Context
@@ -74,12 +71,9 @@ func printConfig(cfg *config.AppConfig) {
 	fmt.Printf("Track Number Padding: %d\n", cfg.TrackNumberPadding)
 	fmt.Printf("Create M3U8 Playlist: %t\n", cfg.CreateM3U8Playlist)
 
-<<<<<<< HEAD
-=======
 	fmt.Printf("Track File Template: %s\n", cfg.TrackFileTemplate)
 	fmt.Printf("Key System: %s\n", cfg.KeySystem)
 
->>>>>>> 515bc7c (Initial commit)
 	fmt.Printf("Cover Size: %s\n", cfg.CoverSize)
 	fmt.Printf("Keep Cover: %t\n", cfg.KeepCover)
 	fmt.Printf("Fix Tags: %t\n", cfg.FixTags)

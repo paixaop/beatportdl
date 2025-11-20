@@ -73,14 +73,6 @@ func Setup(configDir string) (cfg *config.AppConfig, cachePath string, err error
 }
 
 func (app *application) mainPrompt() {
-<<<<<<< HEAD
-	fmt.Print("Enter url or search query: ")
-	input := GetLine()
-	if strings.HasPrefix(input, "https://www.beatport.com") || strings.HasPrefix(input, "https://www.beatsource.com") {
-		app.urls = append(app.urls, input)
-	} else {
-		app.search(input)
-=======
 	fmt.Print("Enter url, track ID, or search query: ")
 	input := GetLine()
 
@@ -222,19 +214,6 @@ func extractStoreTag(query string) (store, trimmedQuery string) {
 }
 
 func (app *application) parseTextFile(path string) {
-<<<<<<< HEAD
-	file, err := os.Open(path)
-	defer file.Close()
-	if err != nil {
-		app.FatalError("read input text file", err)
-	}
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-
-	for scanner.Scan() {
-		app.urls = append(app.urls, scanner.Text())
-	}
-=======
 	app.parseTextFileWithStore(path, "beatport") // Default to Beatport for backward compatibility
 }
 

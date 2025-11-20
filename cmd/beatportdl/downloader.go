@@ -151,11 +151,7 @@ func (app *application) saveTrack(inst *beatport.Beatport, track *beatport.Track
 		displayQuality = "AAC 128kbps - HLS"
 		stream = trackStream
 	default:
-<<<<<<< HEAD
-		trackDownload, err := inst.GetTrackDownload(track.ID, quality)
-=======
 		trackDownload, err := inst.DownloadTrack(track.ID, quality)
->>>>>>> 515bc7c (Initial commit)
 		if err != nil {
 			return "", err
 		}
@@ -473,11 +469,8 @@ func (app *application) handleUrl(url string) {
 		app.handleArtistLink(inst, link)
 	case beatport.Top100Link:
 		app.handleTop100Link(inst, link)
-<<<<<<< HEAD
-=======
 	case beatport.CollectionLink:
 		app.handleCollectionLink(inst, link)
->>>>>>> 515bc7c (Initial commit)
 	default:
 		app.LogError("handle URL", ErrUnsupportedLinkType)
 	}
@@ -1117,8 +1110,6 @@ func (app *application) handleTop100Link(inst *beatport.Beatport, link *beatport
 		}
 	}
 }
-<<<<<<< HEAD
-=======
 
 func (app *application) handleCollectionLink(inst *beatport.Beatport, link *beatport.Link) {
 	// Initialize Chrome browser for authentication
